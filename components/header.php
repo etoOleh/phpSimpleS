@@ -15,23 +15,43 @@
                             Мои заявки
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="add-ticket.html">Добавить</a></li>
-                            <li><a class="dropdown-item" href="my-tickets.html">Мои заявки <span class="badge bg-secondary">4</span></a></li>
+                            <li><a class="dropdown-item" href="add-ticket.php">Добавить</a></li>
+                            <li><a class="dropdown-item" href="my-tickets.php">Мои заявки <span class="badge bg-secondary">4</span></a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a href="tickets-control.html" class="nav-link">Управление заявками</a>
+                        <a href="/tickets-control.php" class="nav-link">Управление заявками</a>
                     </li>
                 </ul>
                 <div class="right-side d-flex">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item dropdown">
+                            <?php
+                            $user = false;
+                            if (isset($_SESSION['user'])) {
+                                $query = $db->prepare("SELECT * FROM `users` WHERE id = :id");
+                                $query->execute([':id' => $_SESSION['user']]);
+                                $user = $query->fetch(PDO::FETCH_ASSOC);
+                            }
+                            ?>
                             <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Аккаунт
+                                <?= !$user ? 'Аккаунт' : $user['name'] ?>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="accountDropdown">
-                                <li><a class="dropdown-item" href="login.html">Вход</a></li>
-                                <li><a class="dropdown-item" href="register.html">Регистрация</a></li>
+                                <?php
+
+                                if(!$user) {
+                                ?>
+                                <li><a class="dropdown-item" href="/login.php">Вход</a></li>
+                                <li><a class="dropdown-item" href="/register.php">Регистрация</a></li>
+
+                                <?php
+                                } else {
+                                ?>
+                                    <li><a class="dropdown-item" href="/actions/user/logout.php">Выход</a></li>
+                                    <?php
+                                }
+                                ?>
                             </ul>
                         </li>
                     </ul>

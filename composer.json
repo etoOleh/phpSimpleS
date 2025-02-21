@@ -1,0 +1,6 @@
+{
+    "name": "home/htdocs",
+    "require": {
+        "larapack/dd": "^1.1"
+    }
+}
