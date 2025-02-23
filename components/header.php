@@ -10,30 +10,35 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/">Заявки</a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Мои заявки
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="add-ticket.php">Добавить</a></li>
-                            <li><a class="dropdown-item" href="my-tickets.php">Мои заявки <span class="badge bg-secondary">4</span></a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/tickets-control.php" class="nav-link">Управление заявками</a>
-                    </li>
+                    <?php
+                        $config = require __DIR__ . '/../config/app.php';
+                        if($user) {
+                            ?>
+
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Мои заявки
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="/add-ticket.php">Добавить</a></li>
+                                    <li><a class="dropdown-item" href="/my-tickets.php">Мои заявки <span class="badge bg-secondary">4</span></a></li>
+                                </ul>
+                            </li>
+
+                            <?php
+                        }
+                        if ($user && (int)$user['group_id'] === $config['admin_user_group']) {
+                            ?>
+                                <li class="nav-item">
+                                    <a href="/tickets-control.php" class="nav-link">Управление заявками</a>
+                                </li>
+                            <?php
+                        }
+                    ?>
                 </ul>
                 <div class="right-side d-flex">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item dropdown">
-                            <?php
-                            $user = false;
-                            if (isset($_SESSION['user'])) {
-                                $query = $db->prepare("SELECT * FROM `users` WHERE id = :id");
-                                $query->execute([':id' => $_SESSION['user']]);
-                                $user = $query->fetch(PDO::FETCH_ASSOC);
-                            }
-                            ?>
                             <a class="nav-link dropdown-toggle" href="#" id="accountDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <?= !$user ? 'Аккаунт' : $user['name'] ?>
                             </a>
@@ -48,7 +53,11 @@
                                 <?php
                                 } else {
                                 ?>
-                                    <li><a class="dropdown-item" href="/actions/user/logout.php">Выход</a></li>
+                                    <li>
+                                        <form action="/actions/user/logout.php" method="post">
+                                            <button type="submit" class="dropdown-item">Выход</button>
+                                        </form>
+                                    </li>
                                     <?php
                                 }
                                 ?>

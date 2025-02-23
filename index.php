@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/app/requires.php';
 ?>
 
 
@@ -26,22 +27,37 @@ session_start();
             <h2 class="display-6 mb-3">Заявки</h2>
         </div>
         <div class="row">
+
+            <?php
+
+            $tickets = $db->query("SELECT * FROM `tickets`")->fetchAll(PDO::FETCH_ASSOC);
+            $tags = $db->query("SELECT * FROM `tickets_tags`")->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($tickets as $ticket) {
+                $tagId = $ticket['tag_id'];
+                $tag = array_filter($tags, function ($tag) use ($tagId) {
+                    return (int)$tag['id'] === (int)$tagId;
+                });
+                $tag = array_shift($tag);
+
+                ?>
             <div class="card mb-3">
-                <img src="src/static/image-2.jpg" class="card-img-top" alt="...">
+                <img src="<?= $ticket['image'];?>" class="card-img-top" alt="...">
                 <div class="card-body">
-                    <h5 class="card-title">Отремонтировать асфальт <span class="badge bg-warning text-dark">В процессе</span> </h5>
-                    <p class="card-text">Возле дороги на улице Ейдемана рядом с Политическим колледжем образовалась опасная яма.</p>
-                    <p class="card-text"><small class="text-muted">Добавлено: 24.12.2021</small></p>
+                    <h5 class="card-title"><?= $ticket['title'];?>
+                        <span class="badge rounded-pill"
+                              style="background: <?= $tag['background'];?>; color: <?= $tag['color'];?>;">
+                                <?= $tag['label']?>
+                            </span>
+                    </h5>
+                    <p class="card-text"><?= $ticket['description'];?></p>
+                    <p class="card-text"><small class="text-muted">Добавлено: <?= $ticket['created_at'];?></small></p>
                 </div>
             </div>
-            <div class="card mb-3">
-                <img src="src/static/image-1.jpg" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">Убрать мусор <span class="badge bg-success">Выполнено</span> </h5>
-                    <p class="card-text">В нашем районе стали складировать много мусора, никто не убирает..</p>
-                    <p class="card-text"><small class="text-muted">Добавлено: 24.12.2021</small></p>
-                </div>
-            </div>
+
+                <?php
+            }
+
+            ?>
         </div>
     </div>
 </section>

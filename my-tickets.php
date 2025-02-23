@@ -1,3 +1,13 @@
+<?php
+
+session_start();
+require_once __DIR__ . '/app/requires.php';
+
+if (!isset($_SESSION["user"])) {
+    header("Location: /login.php");
+}
+
+?>
 <!doctype html>
 <html lang="ru">
 <head>
@@ -27,66 +37,57 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>
-                        <img src="src/static/image-1.jpg" width="200" alt="">
-                    </td>
-                    <td>Убрать мусор</td>
-                    <td>В нашем районе стали складировать много мусора, никто не убирает..</td>
-                    <td>
-                        <span class="badge rounded-pill bg-success">Выполнено</span>
-                    </td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                Действия
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li><a class="dropdown-item" href="#">Удалить</a></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <img src="src/static/image-2.jpg" width="200" alt="">
-                    </td>
-                    <td>Отремонтировать асфальт</td>
-                    <td>Возле дороги на улице Ейдемана рядом с Политическим колледжем образовалась опасная яма.</td>
-                    <td>
-                        <span class="badge rounded-pill bg-warning">В процессе</span>
-                    </td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                Действия
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li><a class="dropdown-item" href="#">Удалить</a></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <img src="src/static/image-3.jpg" width="200" alt="">
-                    </td>
-                    <td>Замело снегом</td>
-                    <td>Весь двор в ЖК Пушкинский замело снегом, выезд и въезд затруднены</td>
-                    <td>
-                        <span class="badge rounded-pill bg-info">Создано</span>
-                    </td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                Действия
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li><a class="dropdown-item" href="#">Удалить</a></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
+
+                <?php
+
+                $tags = $db->query("SELECT * FROM `tickets_tags`")->fetchAll(PDO::FETCH_ASSOC);
+
+                $query = $db->prepare("SELECT * FROM `tickets` WHERE `user_id` = :user_id");
+                $query->execute(['user_id' => $_SESSION['user']]);
+                $tickets = $query->fetchAll(PDO::FETCH_ASSOC);
+//                dd($tickets);
+                foreach ($tickets as $ticket) {
+                    $tagId = $ticket['tag_id'];
+                    $tag = array_filter($tags, function ($tag) use ($tagId) {
+                        return (int)$tag['id'] === (int)$tagId;
+                    });
+                    $tag = array_shift($tag);
+
+                    ?>
+
+                    <tr>
+                        <td>
+                            <img src="<?= $ticket['image'];?>" width="200" alt="">
+                        </td>
+                        <td><?= $ticket['title'];?></td>
+                        <td><?= $ticket['description'];?></td>
+                        <td>
+                            <span class="badge rounded-pill"
+                                  style="background: <?= $tag['background'];?>; color: <?= $tag['color'];?>;">
+                                <?= $tag['label']?>
+                            </span>
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Действия
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li>
+                                        <form action="/actions/tickets/remove.php" method="post">
+                                            <input type="hidden" name="id" value="<?= $ticket['id'];?>">
+                                            <button class="dropdown-item" type="submit">Удалить</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <?php
+                }
+
+                ?>
                 </tbody>
             </table>
         </div>

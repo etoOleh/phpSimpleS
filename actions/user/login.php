@@ -42,11 +42,13 @@ $user = $query->fetch(PDO::FETCH_ASSOC);
 if (!$user) {
     $_SESSION['auth_error'] = true;
     header('Location: /login.php');
+    die();
 }
 
 if (!password_verify($password, $user['password'])) {
     $_SESSION['auth_error'] = true;
     header('Location: /login.php');
+    die();
 }
 
 $_SESSION['user'] = $user['id'];
