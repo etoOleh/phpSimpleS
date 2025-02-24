@@ -64,8 +64,8 @@
                             </ul>
                         </li>
                     </ul>
-                    <form class="d-flex">
-                        <input class="form-control me-2" type="search" placeholder="Поиск заявок" aria-label="Поиск заявок">
+                    <form method="get" action="/" class="d-flex">
+                        <input class="form-control me-2" name="q" value="<?= $_GET['q'] ?? '';?>" type="search" placeholder="Поиск заявок" aria-label="Поиск заявок">
                         <button class="btn btn-outline-success" type="submit">Поиск</button>
                     </form>
                 </div>

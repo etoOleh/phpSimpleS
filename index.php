@@ -30,7 +30,24 @@ require_once __DIR__ . '/app/requires.php';
 
             <?php
 
-            $tickets = $db->query("SELECT * FROM `tickets`")->fetchAll(PDO::FETCH_ASSOC);
+            if (isset($_GET['q'])) {
+                $qq = $db->prepare("SELECT * FROM `tickets` WHERE `title` LIKE :q ORDER BY `id` DESC");
+                $qq->execute([':q' => '%' . $_GET['q'] . '%']);
+                $tickets = $qq->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                $tickets = $db->query("SELECT * FROM `tickets` ORDER BY `id` DESC")->fetchAll(PDO::FETCH_ASSOC);
+            }
+
+            if (empty($tickets)) {
+                ?>
+
+                <div class="alert alert-warning" role="alert">
+                    По вашему запросу ничего не найдено
+                </div>
+
+                    <?php
+            }
+
             $tags = $db->query("SELECT * FROM `tickets_tags`")->fetchAll(PDO::FETCH_ASSOC);
             foreach ($tickets as $ticket) {
                 $tagId = $ticket['tag_id'];

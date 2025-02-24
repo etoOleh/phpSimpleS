@@ -48,11 +48,7 @@ require_once __DIR__ . '/app/requires.php';
                 <?php
 
                 $tags = $db->query("SELECT * FROM `tickets_tags`")->fetchAll(PDO::FETCH_ASSOC);
-
-                $query = $db->prepare("SELECT * FROM `tickets` WHERE `user_id` = :user_id");
-                $query->execute(['user_id' => $_SESSION['user']]);
-                $tickets = $query->fetchAll(PDO::FETCH_ASSOC);
-                //                dd($tickets);
+                $tickets = $db->query("SELECT * FROM `tickets`")->fetchAll(PDO::FETCH_ASSOC);
                 foreach ($tickets as $ticket) {
                     $tagId = $ticket['tag_id'];
                     $tag = array_filter($tags, function ($tag) use ($tagId) {
@@ -81,20 +77,33 @@ require_once __DIR__ . '/app/requires.php';
                                 </button>
                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                     <li>
+                                        <form action="/actions/tickets/change_tag.php" method="post">
+                                            <input type="hidden" name="id" value="<?= $ticket['id'];?>">
+                                            <input type="hidden" name="tag" value="<?= $config['success_tickets_tag'];?>">
+                                            <button class="dropdown-item" type="submit">Выполнено</button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form action="/actions/tickets/change_tag.php" method="post">
+                                            <input type="hidden" name="id" value="<?= $ticket['id'];?>">
+                                            <input type="hidden" name="tag" value="<?= $config['in_progress_tickets_tag'];?>">
+                                            <button class="dropdown-item" type="submit">В процессе</button>
+                                        </form>
+                                    </li>
+                                    <li>
+                                        <form action="/actions/tickets/change_tag.php" method="post">
+                                            <input type="hidden" name="id" value="<?= $ticket['id'];?>">
+                                            <input type="hidden" name="tag" value="<?= $config['reject_tickets_tag'];?>">
+                                            <button class="dropdown-item" type="submit">Отклонить</button>
+                                        </form>
+                                    </li>
+                                    <li>
                                         <form action="/actions/tickets/remove.php" method="post">
                                             <input type="hidden" name="id" value="<?= $ticket['id'];?>">
                                             <button class="dropdown-item" type="submit">Удалить</button>
                                         </form>
                                     </li>
                                 </ul>
-
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                    <li><a class="dropdown-item" href="#">Выполнено</a></li>
-                                    <li><a class="dropdown-item" href="#">В процессе</a></li>
-                                    <li><a class="dropdown-item" href="#">Отклонить</a></li>
-                                    <li><a class="dropdown-item" href="#">Удалить</a></li>
-                                </ul>
-
 
                             </div>
                         </td>
@@ -104,29 +113,6 @@ require_once __DIR__ . '/app/requires.php';
                 }
 
                 ?>
-                <tr>
-                    <td>
-                        <img src="src/static/image-3.jpg" width="200" alt="">
-                    </td>
-                    <td>Замело снегом</td>
-                    <td>Весь двор в ЖК Пушкинский замело снегом, выезд и въезд затруднены</td>
-                    <td>
-                        <span class="badge rounded-pill bg-info">Создано</span>
-                    </td>
-                    <td>
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                                Действия
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                <li><a class="dropdown-item" href="#">Выполнено</a></li>
-                                <li><a class="dropdown-item" href="#">В процессе</a></li>
-                                <li><a class="dropdown-item" href="#">Отклонить</a></li>
-                                <li><a class="dropdown-item" href="#">Удалить</a></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
                 </tbody>
             </table>
         </div>
